@@ -13,13 +13,19 @@ var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
 var users = new Users();
-
+var rooms = [];
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
   console.log('New user connected');
+  rooms = users.users.map((user) => user.room);
 
   socket.on('join', (params, callback) => {
+    var nonIdenticalUSer = users.users.filter(user => user.name === params.name );
+    if(nonIdenticalUSer.length === 1){ 
+      return callback('This user name is already been taken :)');
+    }
+    
     if (!isRealString(params.name) || !isRealString(params.room)) {
       return callback('Name and room name are required.');
     }
@@ -36,8 +42,7 @@ io.on('connection', (socket) => {
 
   socket.on('createMessage', (message, callback) => {
     var user = users.getUser(socket.id);
-    
-
+  
     console.log(message.text);
     if(user && isRealString(message.text)){
       io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
@@ -62,6 +67,9 @@ io.on('connection', (socket) => {
       io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
     }
   });
+
+
+  socket.emit('roomsList', rooms);
 });
 
 server.listen(port, () => {
