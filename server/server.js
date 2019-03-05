@@ -18,7 +18,11 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
   console.log('New user connected');
-  rooms = users.users.map((user) => user.room);
+  rooms = users.users
+  .map((user) => user.room)
+  .filter(function(elem, pos,arr) {
+    return arr.indexOf(elem) == pos;
+  });
 
   socket.on('join', (params, callback) => {
     var nonIdenticalUSer = users.users.filter(user => user.name === params.name );
