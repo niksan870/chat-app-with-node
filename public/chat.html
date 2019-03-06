@@ -17,11 +17,14 @@
   </div>
 
   <div class="chat__main">
-    <ol id="messages" class="chat__messages"></ol>
+    <ol id="messages" class="chat__messages">
+    </ol>
+    <div id="feedback">
 
+    </div>
     <div class="chat__footer">
       <form id="message-form">
-        <input name="message" type="text" placeholder="Message" autofocus autocomplete="off"/>
+        <input name="message" type="text" placeholder="Message" autocomplete="off" id="inputMessage"/>
         <button>Send</button>
       </form>
       <button id="send-location">Send location</button>

@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
-const {generateMessage, generateLocationMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage, generateIsTyping} = require('./utils/message');
 const {isRealString} = require('./utils/validation');
 const {Users} = require('./utils/users');
 
@@ -34,6 +34,7 @@ io.on('connection', (socket) => {
       return callback('Name and room name are required.');
     }
 
+    console.log(params.name);
     socket.join(params.room);
     users.removeUser(socket.id);
     users.addUser(socket.id, params.name, params.room);
@@ -51,7 +52,7 @@ io.on('connection', (socket) => {
     if(user && isRealString(message.text)){
       io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
     }
-
+  
     callback();
   });
 
@@ -72,6 +73,11 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('typing', (data) => {
+    var user = users.getUser(socket.id);
+
+    io.to(user.room).emit('typing', generateIsTyping(user.name, data));
+  });
 
   socket.emit('roomsList', rooms);
 });

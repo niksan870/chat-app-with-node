@@ -1,4 +1,6 @@
 var socket = io();
+var message = document.getElementById('inputMessage'),
+    feedback = document.getElementById('feedback');
 
 function scrollToBottom () {
   // Selectors
@@ -52,6 +54,7 @@ socket.on('newMessage', function (message) {
     createdAt: formattedTime
   });
 
+  feedback.innerHTML = "";
   jQuery('#messages').append(html);
   scrollToBottom();
 });
@@ -71,7 +74,6 @@ socket.on('newLocationMessage', function (message) {
 
 jQuery('#message-form').on('submit', function (e) {
   e.preventDefault();
-
   var messageTextbox = jQuery('[name=message]');
 
   socket.emit('createMessage', {
@@ -80,6 +82,21 @@ jQuery('#message-form').on('submit', function (e) {
     messageTextbox.val('')
   });
 });
+
+message.addEventListener('keyup', function(){
+  socket.emit('typing', this.value);
+});
+
+
+socket.on('typing', function (data) {
+  if(data.text === ""){
+    feedback.innerHTML = '';
+  } else {
+    feedback.innerHTML = '<p><em>'+ data.from +' is typing a message</em><p/>';
+  }
+  scrollToBottom();
+})
+
 
 var locationButton = jQuery('#send-location');
 locationButton.on('click', function () {
@@ -100,3 +117,4 @@ locationButton.on('click', function () {
     alert('Unable to fetch location.');
   });
 });
+ 

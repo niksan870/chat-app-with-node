@@ -6,7 +6,6 @@ socket.on('connect', function () {
 
 console.log('Error');
 $('#switch').on('click', function() {
-  console.log('clicked');
   if($(this).text() === "Join"){
     $(this).text("Create");
     $('#join_form').css('display', 'none');
@@ -19,7 +18,6 @@ $('#switch').on('click', function() {
 });
 
 socket.on('roomsList', function (rooms) {
-  
   rooms.forEach(function (room) {
     $('#select_room').append(jQuery('<option></option>').text(room))
   });
